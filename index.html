@@ -5,6 +5,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Latin Declension Practice</title>
+
 <style>
     * { box-sizing: border-box; }
 
@@ -17,7 +18,7 @@
     }
 
     .container {
-        max-width: 750px;
+        max-width: 850px;
         margin: auto;
         background: white;
         padding: 25px;
@@ -25,51 +26,32 @@
         box-shadow: 0 3px 12px #00000012;
     }
 
-    h1 { text-align: center; margin-top: 0; }
-
-    .controls {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 10px;
-        justify-content: center;
-        margin: 20px 0;
-    }
-
-    select, button {
-        padding: 11px 15px;
-        border-radius: 7px;
-        border: 1px solid #ccc;
-        font-size: 15px;
-    }
-
-    button {
-        background: #334e8a;
-        color: white;
-        border: none;
-        cursor: pointer;
-    }
-
-    button:hover { background: #243966; }
-
-    button.secondary {
-        background: #666;
+    h1 {
+        text-align: center;
+        margin-top: 0;
     }
 
     .instructions {
         text-align: center;
         color: #666;
         font-size: 14px;
+        line-height: 1.6;
     }
 
     h2 {
         text-align: center;
         margin-bottom: 5px;
+        font-size: 19px;
+    }
+
+    .chart {
+        margin-top: 35px;
     }
 
     table {
         width: 100%;
         border-collapse: collapse;
-        margin-top: 20px;
+        margin-top: 15px;
         text-align: center;
     }
 
@@ -86,6 +68,7 @@
         font-weight: bold;
         background: #f5f5f5;
         text-align: left;
+        width: 30%;
     }
 
     input {
@@ -108,17 +91,47 @@
         background: #fff0f0;
     }
 
-    .feedback {
-        text-align: center;
-        margin: 20px 0;
-        font-size: 17px;
-        font-weight: bold;
-    }
-
     .answer {
         font-size: 12px;
         color: #c0392b;
         margin-top: 5px;
+    }
+
+    .controls {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        justify-content: center;
+        margin: 25px 0;
+    }
+
+    button {
+        padding: 12px 18px;
+        border-radius: 7px;
+        border: none;
+        font-size: 15px;
+        background: #334e8a;
+        color: white;
+        cursor: pointer;
+    }
+
+    button:hover {
+        background: #243966;
+    }
+
+    button.secondary {
+        background: #666;
+    }
+
+    button.secondary:hover {
+        background: #444;
+    }
+
+    .feedback {
+        text-align: center;
+        margin: 20px 0;
+        font-size: 18px;
+        font-weight: bold;
     }
 
     .score {
@@ -128,59 +141,64 @@
     }
 
     @media(max-width: 500px) {
-        .container { padding: 15px 9px; }
-        th, td { padding: 8px 3px; }
-        input { font-size: 14px; min-width: 45px; }
+        .container {
+            padding: 15px 9px;
+        }
+
+        th, td {
+            padding: 8px 3px;
+            font-size: 13px;
+        }
+
+        input {
+            font-size: 14px;
+            min-width: 40px;
+            width: 95%;
+        }
+
+        h2 {
+            font-size: 16px;
+        }
     }
 </style>
 </head>
+
 <body>
 
 <div class="container">
+
     <h1>Latin Declension Practice</h1>
 
     <p class="instructions">
-        Fill in the singular and plural endings for each case.
-        Then check your answers!
+        Fill in the singular and plural endings for every case
+        in all five declensions. Then check your answers!
     </p>
 
-    <div class="controls">
-        <select id="declension">
-            <option value="random">Random Declension</option>
-            <option value="first">1st Declension</option>
-            <option value="secondM">2nd Declension (Masculine)</option>
-            <option value="secondN">2nd Declension (Neuter)</option>
-            <option value="thirdMF">3rd Declension (Masculine/Feminine)</option>
-            <option value="thirdN">3rd Declension (Neuter)</option>
-        </select>
-        <button onclick="newChart()">New Chart</button>
-    </div>
-
-    <h2 id="chartTitle">1st Declension</h2>
-
-    <table>
-        <thead>
-            <tr>
-                <th>Case</th>
-                <th>Singular</th>
-                <th>Plural</th>
-            </tr>
-        </thead>
-        <tbody id="chartBody"></tbody>
-    </table>
+    <div id="charts"></div>
 
     <div class="controls">
-        <button onclick="checkAnswers()">Check Answers</button>
-        <button class="secondary" onclick="showAnswers()">Show Answers</button>
-        <button class="secondary" onclick="newChart()">Try Again</button>
+        <button onclick="checkAnswers()">
+            Check All Answers
+        </button>
+
+        <button class="secondary" onclick="showAnswers()">
+            Show All Answers
+        </button>
+
+        <button class="secondary" onclick="resetAnswers()">
+            Clear All Answers
+        </button>
     </div>
 
     <div class="feedback" id="feedback"></div>
     <div class="score" id="score"></div>
+
 </div>
 
 <script>
+
 const charts = {
+
     first: {
         title: "1st Declension",
         cases: [
@@ -230,121 +248,247 @@ const charts = {
             ["Ablative", "e", "ibus"]
         ]
     }
+
 };
 
-let currentChart = "first";
 
-function newChart() {
-    const selection = document.getElementById("declension").value;
+// Create all five charts
 
-    const keys = Object.keys(charts);
+function createCharts() {
 
-    currentChart = selection === "random"
-        ? keys[Math.floor(Math.random() * keys.length)]
-        : selection;
+    const container = document.getElementById("charts");
 
-    const chart = charts[currentChart];
+    container.innerHTML = "";
 
-    document.getElementById("chartTitle").textContent = chart.title;
-    document.getElementById("feedback").textContent = "";
-    document.getElementById("score").textContent = "";
+    Object.entries(charts).forEach(([key, chart]) => {
 
-    const body = document.getElementById("chartBody");
-    body.innerHTML = "";
+        const section = document.createElement("div");
+        section.className = "chart";
 
-    chart.cases.forEach((row, index) => {
-        const tr = document.createElement("tr");
+        const heading = document.createElement("h2");
+        heading.textContent = chart.title;
 
-        tr.innerHTML = `
-            <td>${row[0]}</td>
-            <td>
-                <input type="text" id="s${index}"
-                    autocomplete="off" spellcheck="false">
-                <div class="answer" id="sa${index}"></div>
-            </td>
-            <td>
-                <input type="text" id="p${index}"
-                    autocomplete="off" spellcheck="false">
-                <div class="answer" id="pa${index}"></div>
-            </td>
+        section.appendChild(heading);
+
+        const table = document.createElement("table");
+
+        table.innerHTML = `
+            <thead>
+                <tr>
+                    <th>Case</th>
+                    <th>Singular</th>
+                    <th>Plural</th>
+                </tr>
+            </thead>
+            <tbody></tbody>
         `;
 
-        body.appendChild(tr);
+        const body = table.querySelector("tbody");
+
+        chart.cases.forEach((row, index) => {
+
+            const tr = document.createElement("tr");
+
+            tr.innerHTML = `
+                <td>${row[0]}</td>
+
+                <td>
+                    <input
+                        type="text"
+                        id="${key}-s${index}"
+                        autocomplete="off"
+                        spellcheck="false"
+                    >
+                    <div class="answer" id="${key}-sa${index}"></div>
+                </td>
+
+                <td>
+                    <input
+                        type="text"
+                        id="${key}-p${index}"
+                        autocomplete="off"
+                        spellcheck="false"
+                    >
+                    <div class="answer" id="${key}-pa${index}"></div>
+                </td>
+            `;
+
+            body.appendChild(tr);
+
+        });
+
+        section.appendChild(table);
+        container.appendChild(section);
+
     });
+
+    // Press Enter to check all answers
 
     document.querySelectorAll("input").forEach(input => {
+
         input.addEventListener("keydown", event => {
-            if (event.key === "Enter") checkAnswers();
+
+            if (event.key === "Enter") {
+                checkAnswers();
+            }
+
         });
+
     });
+
 }
 
+
+// Normalize answers
+
 function normalize(value) {
+
     return value.toLowerCase()
         .trim()
         .replace(/[\s-]/g, "");
+
 }
+
+
+// Check whether an answer is correct
 
 function isCorrect(input, answer) {
+
     const entered = normalize(input);
+
     const accepted = answer.split("/").map(normalize);
+
     return accepted.includes(entered);
+
 }
+
+
+// Check every chart
 
 function checkAnswers() {
-    const chart = charts[currentChart];
+
     let correct = 0;
-    let total = 8;
+    let total = 0;
 
-    chart.cases.forEach((row, index) => {
-        ["s", "p"].forEach((type, column) => {
-            const input = document.getElementById(type + index);
-            const answer = row[column + 1];
-            const result = isCorrect(input.value, answer);
+    Object.entries(charts).forEach(([key, chart]) => {
 
-            input.classList.remove("correct", "incorrect");
-            input.classList.add(result ? "correct" : "incorrect");
+        chart.cases.forEach((row, index) => {
 
-            if (result) correct++;
+            ["s", "p"].forEach((type, column) => {
 
-            const answerBox = document.getElementById(
-                (type === "s" ? "sa" : "pa") + index
-            );
+                total++;
 
-            answerBox.textContent = result ? "✓" : "Answer: " + answer;
+                const input = document.getElementById(
+                    `${key}-${type}${index}`
+                );
+
+                const answer = row[column + 1];
+
+                const result = isCorrect(input.value, answer);
+
+                input.classList.remove("correct", "incorrect");
+
+                input.classList.add(
+                    result ? "correct" : "incorrect"
+                );
+
+                if (result) correct++;
+
+                const answerBox = document.getElementById(
+                    `${key}-${type === "s" ? "sa" : "pa"}${index}`
+                );
+
+                answerBox.textContent = result
+                    ? "✓"
+                    : "Answer: " + answer;
+
+            });
+
         });
-    });
 
-    const feedback = document.getElementById("feedback");
-
-    feedback.textContent = correct === total
-        ? "Perfect! All answers are correct!"
-        : correct + " out of " + total + " correct.";
-
-    document.getElementById("score").textContent =
-        "Keep practicing until you get them all!";
-}
-
-function showAnswers() {
-    const chart = charts[currentChart];
-
-    chart.cases.forEach((row, index) => {
-        ["s", "p"].forEach((type, column) => {
-            const input = document.getElementById(type + index);
-            input.value = row[column + 1];
-            input.classList.remove("incorrect");
-            input.classList.add("correct");
-        });
     });
 
     document.getElementById("feedback").textContent =
-        "Answer key displayed.";
+        correct === total
+            ? "Perfect! All answers are correct!"
+            : correct + " out of " + total + " correct.";
+
+    document.getElementById("score").textContent =
+        "Keep practicing until you get all 40 correct!";
+
 }
 
-// Start with a random chart
-newChart();
+
+// Show every answer
+
+function showAnswers() {
+
+    Object.entries(charts).forEach(([key, chart]) => {
+
+        chart.cases.forEach((row, index) => {
+
+            ["s", "p"].forEach((type, column) => {
+
+                const input = document.getElementById(
+                    `${key}-${type}${index}`
+                );
+
+                const answer = row[column + 1];
+
+                input.value = answer;
+
+                input.classList.remove("incorrect");
+                input.classList.add("correct");
+
+                const answerBox = document.getElementById(
+                    `${key}-${type === "s" ? "sa" : "pa"}${index}`
+                );
+
+                answerBox.textContent = "";
+
+            });
+
+        });
+
+    });
+
+    document.getElementById("feedback").textContent =
+        "All answer keys displayed!";
+
+    document.getElementById("score").textContent = "";
+
+}
+
+
+// Clear all answers
+
+function resetAnswers() {
+
+    document.querySelectorAll("input").forEach(input => {
+
+        input.value = "";
+
+        input.classList.remove("correct", "incorrect");
+
+    });
+
+    document.querySelectorAll(".answer").forEach(box => {
+
+        box.textContent = "";
+
+    });
+
+    document.getElementById("feedback").textContent = "";
+    document.getElementById("score").textContent = "";
+
+}
+
+
+// Start the page
+
+createCharts();
+
 </script>
 
 </body>
 </html>
-
