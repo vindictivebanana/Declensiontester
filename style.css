@@ -12,7 +12,8 @@ body {
 
 main,
 .container {
-  max-width: 850px;
+  width: 100%;
+  max-width: 1000px;
   margin: 0 auto;
   padding: 25px;
   background: white;
@@ -218,3 +219,78 @@ button.secondary:hover {
     font-size: 16px;
   }
 }
+
+/* Shared table styles */
+table {
+  width: 100%;
+  margin-top: 15px;
+  border-collapse: collapse;
+  text-align: center;
+}
+
+th,
+td {
+  padding: 12px 7px;
+  border: 1px solid #ddd;
+}
+
+th {
+  background: #e9edf5;
+}
+
+/* Declension table: label column */
+td:first-child {
+  width: 30%;
+  background: #f5f5f5;
+  font-weight: bold;
+  text-align: left;
+}
+
+/* Tense tester: three tables side by side */
+.tense-tables {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 12px;
+}
+
+.tense-chart h2 {
+  text-align: center;
+}
+
+.tense-chart td:first-child {
+  width: auto;
+  text-align: center;
+}
+
+.tense-chart input {
+  width: 90%;
+  min-width: 0;
+}
+
+@media (max-width: 650px) {
+  .tense-tables {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 500px) {
+  th,
+  td {
+    padding: 8px 3px;
+    font-size: 13px;
+  }
+}
+
+.macron-buttons {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  margin: 12px 0;
+}
+
+.macron-buttons button {
+  min-width: 36px;
+  padding: 5px 8px;
+  font-size: 14px;
+}
+

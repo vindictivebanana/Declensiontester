@@ -47,24 +47,23 @@
 <script>
 
 const charts = {
-
     first: {
         title: "1st Declension",
         cases: [
             ["Nominative", "a", "ae"],
-            ["Dative", "ae", "is"],
-            ["Accusative", "am", "as"],
-            ["Ablative", "a", "is"]
+            ["Dative", "ae", "īs"],
+            ["Accusative", "am", "ās"],
+            ["Ablative", "ā", "īs"]
         ]
     },
 
     secondM: {
         title: "2nd Declension (Masculine)",
         cases: [
-            ["Nominative", "-us / -er", "i"],
-            ["Dative", "o", "is"],
-            ["Accusative", "um", "os"],
-            ["Ablative", "o", "is"]
+            ["Nominative", "-us / -er", "ī"],
+            ["Dative", "ō", "īs"],
+            ["Accusative", "um", "ōs"],
+            ["Ablative", "ō", "īs"]
         ]
     },
 
@@ -72,18 +71,18 @@ const charts = {
         title: "2nd Declension (Neuter)",
         cases: [
             ["Nominative", "um", "a"],
-            ["Dative", "o", "is"],
+            ["Dative", "ō", "īs"],
             ["Accusative", "um", "a"],
-            ["Ablative", "o", "is"]
+            ["Ablative", "ō", "īs"]
         ]
     },
 
     thirdMF: {
         title: "3rd Declension (Masculine/Feminine)",
         cases: [
-            ["Nominative", "varies", "es"],
-            ["Dative", "i", "ibus"],
-            ["Accusative", "em", "es"],
+            ["Nominative", "varies", "ēs"],
+            ["Dative", "ī", "ibus"],
+            ["Accusative", "em", "ēs"],
             ["Ablative", "e", "ibus"]
         ]
     },
@@ -92,14 +91,12 @@ const charts = {
         title: "3rd Declension (Neuter)",
         cases: [
             ["Nominative", "varies", "a"],
-            ["Dative", "i", "ibus"],
+            ["Dative", "ī", "ibus"],
             ["Accusative", "varies", "a"],
             ["Ablative", "e", "ibus"]
         ]
     }
-
 };
-
 
 // Create all five charts
 
@@ -167,6 +164,19 @@ function createCharts() {
         });
 
         section.appendChild(table);
+	const macronButtons = document.createElement("div");
+	macronButtons.className = "macron-buttons";
+	
+	["ā", "ē", "ī", "ō", "ū"].forEach(letter => {
+	    const button = document.createElement("button");
+	    button.type = "button";
+	    button.textContent = letter;
+	    button.dataset.letter = letter;
+	    macronButtons.appendChild(button);
+	});
+	
+	section.appendChild(macronButtons);
+
         container.appendChild(section);
 
     });
@@ -336,6 +346,31 @@ function resetAnswers() {
 // Start the page
 
 createCharts();
+
+let lastFocusedInput = null;
+
+document.getElementById("charts").addEventListener("focusin", event => {
+    if (event.target.matches("input")) {
+        lastFocusedInput = event.target;
+    }
+});
+
+document.getElementById("charts").addEventListener("click", event => {
+    const button = event.target.closest(".macron-buttons button");
+    if (!button || !lastFocusedInput) return;
+
+    const input = lastFocusedInput;
+    const start = input.selectionStart;
+    const end = input.selectionEnd;
+    const letter = button.dataset.letter;
+
+    input.value =
+        input.value.slice(0, start) + letter + input.value.slice(end);
+
+    input.focus();
+    input.setSelectionRange(start + 1, start + 1);
+});
+
 
 </script>
 

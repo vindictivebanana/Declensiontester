@@ -1,0 +1,222 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Latin Tense Practice</title>
+  <link rel="stylesheet" href="style.css">
+ 
+</head>
+<body>
+  <main class="container">
+    <a class="back-button" href="./index.html">← Back to Latin Practice</a>
+
+    <h1>Latin Tense Practice</h1>
+    <p class="instructions">Fill in the endings for each person, then check your answers.</p>
+
+    <div class="verb-info">
+      <label for="conjugation">Conjugation:</label>
+      <select id="conjugation">
+        <option value="1">1st</option>
+        <option value="2">2nd</option>
+        <option value="3">3rd</option>
+        <option value="4">4th</option>
+      </select>
+    </div>
+
+    <div id="tables" class="tense-tables"></div>
+
+    <p class="hint">Select an answer box, then tap a macron to insert it. Answers without macrons are accepted.</p>
+
+    <div class="controls">
+      <button type="button" id="check">Check Answers</button>
+      <button type="button" class="secondary" id="show">Show Answers</button>
+      <button type="button" class="secondary" id="clear">Clear Answers</button>
+    </div>
+
+    <div class="feedback" id="feedback" aria-live="polite"></div>
+    <div class="score" id="score"></div>
+  </main>
+
+  <script>
+    const endings = {
+      present: {
+        1: ["ō", "ās", "at", "āmus", "ātis", "ant"],
+        2: ["eō", "ēs", "et", "ēmus", "ētis", "ent"],
+        3: ["ō", "is", "it", "imus", "itis", "unt"],
+        4: ["iō", "īs", "īt", "īmus", "ītis", "iunt"]
+      },
+      imperfect: {
+        1: ["bam", "bās", "bat", "bāmus", "bātis", "bant"],
+        2: ["bam", "bās", "bat", "bāmus", "bātis", "bant"],
+        3: ["ēbam", "ēbās", "ēbat", "ēbāmus", "ēbātis", "ēbant"],
+        4: ["ēbam", "ēbās", "ēbat", "ēbāmus", "ēbātis", "ēbant"]
+      },
+      perfect: {
+        1: ["ī", "istī", "it", "imus", "istis", "ērunt"],
+        2: ["ī", "istī", "it", "imus", "istis", "ērunt"],
+        3: ["ī", "istī", "it", "imus", "istis", "ērunt"],
+        4: ["ī", "istī", "it", "imus", "istis", "ērunt"]
+      }
+    };
+
+    const tenses = ["present", "imperfect", "perfect"];
+    const people = ["1st", "2nd", "3rd"];
+    const tables = document.getElementById("tables");
+    let lastFocusedInput = null;
+
+    function makeTables() {
+      tables.innerHTML = "";
+
+      tenses.forEach(tense => {
+        const section = document.createElement("section");
+        section.className = "tense-chart";
+
+        const heading = document.createElement("h2");
+        heading.textContent = tense[0].toUpperCase() + tense.slice(1);
+
+        const table = document.createElement("table");
+        table.innerHTML = `
+          <thead>
+            <tr><th>Person</th><th>Singular</th><th>Plural</th></tr>
+          </thead>
+          <tbody></tbody>
+        `;
+
+        const body = table.querySelector("tbody");
+
+        for (let person = 0; person < 3; person++) {
+          const row = document.createElement("tr");
+
+          row.innerHTML = `
+            <td>${people[person]}</td>
+            <td>
+              <input type="text" data-tense="${tense}" data-index="${person}"
+                aria-label="${tense}, ${people[person]} person singular ending"
+                autocomplete="off" spellcheck="false">
+              <div class="answer"></div>
+            </td>
+            <td>
+              <input type="text" data-tense="${tense}" data-index="${person + 3}"
+                aria-label="${tense}, ${people[person]} person plural ending"
+                autocomplete="off" spellcheck="false">
+              <div class="answer"></div>
+            </td>
+          `;
+
+          body.appendChild(row);
+        }
+
+        section.appendChild(heading);
+        section.appendChild(table);
+	const macronButtons = document.createElement("div");
+	macronButtons.className = "macron-buttons";
+	
+	["ā", "ē", "ī", "ō", "ū"].forEach(letter => {
+	  const button = document.createElement("button");
+	  button.type = "button";
+	  button.textContent = letter;
+	  button.dataset.letter = letter;
+	  macronButtons.appendChild(button);
+	});
+
+	section.appendChild(macronButtons);
+
+        tables.appendChild(section);
+      });
+    }
+
+    function normalize(value) {
+      return value.toLowerCase().trim()
+        .replaceAll("ā", "a")
+        .replaceAll("ē", "e")
+        .replaceAll("ī", "i")
+        .replaceAll("ō", "o")
+        .replaceAll("ū", "u");
+    }
+
+    function getAnswer(input) {
+      const conjugation = document.getElementById("conjugation").value;
+      return endings[input.dataset.tense][conjugation][input.dataset.index];
+    }
+
+    function checkAnswers() {
+      const inputs = document.querySelectorAll("#tables input");
+      let correct = 0;
+
+      inputs.forEach(input => {
+        const answer = getAnswer(input);
+        const isCorrect = normalize(input.value) === normalize(answer);
+        const answerBox = input.parentElement.querySelector(".answer");
+
+        input.classList.toggle("correct", isCorrect);
+        input.classList.toggle("incorrect", !isCorrect);
+        answerBox.textContent = isCorrect ? "✓" : `Answer: ${answer}`;
+
+        if (isCorrect) correct++;
+      });
+
+      document.getElementById("feedback").textContent =
+        correct === inputs.length
+          ? "All answers are correct!"
+          : `${correct} of ${inputs.length} correct.`;
+
+      document.getElementById("score").textContent =
+        `You have ${inputs.length} endings to practise.`;
+    }
+
+    function showAnswers() {
+      document.querySelectorAll("#tables input").forEach(input => {
+        input.value = getAnswer(input);
+        input.classList.remove("incorrect");
+        input.classList.add("correct");
+        input.parentElement.querySelector(".answer").textContent = "";
+      });
+
+      document.getElementById("feedback").textContent = "Answer key displayed.";
+      document.getElementById("score").textContent = "";
+    }
+
+    function clearAnswers() {
+      document.querySelectorAll("#tables input").forEach(input => {
+        input.value = "";
+        input.classList.remove("correct", "incorrect");
+        input.parentElement.querySelector(".answer").textContent = "";
+      });
+
+      document.getElementById("feedback").textContent = "";
+      document.getElementById("score").textContent = "";
+    }
+
+    tables.addEventListener("focusin", event => {
+      if (event.target.matches("input")) {
+        lastFocusedInput = event.target;
+      }
+    });
+
+    tables.addEventListener("click", event => {
+      const button = event.target.closest(".macron-buttons button");
+      if (!button || !lastFocusedInput) return;
+    
+      const input = lastFocusedInput;
+      const start = input.selectionStart;
+      const end = input.selectionEnd;
+      const letter = button.dataset.letter;
+    
+      input.value =
+        input.value.slice(0, start) + letter + input.value.slice(end);
+    
+      input.focus();
+      input.setSelectionRange(start + 1, start + 1);
+    });
+
+
+    document.getElementById("check").addEventListener("click", checkAnswers);
+    document.getElementById("show").addEventListener("click", showAnswers);
+    document.getElementById("clear").addEventListener("click", clearAnswers);
+    document.getElementById("conjugation").addEventListener("change", clearAnswers);
+
+    makeTables();
+  </script>
+</body>
+</html>
