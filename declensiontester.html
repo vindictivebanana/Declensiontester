@@ -60,10 +60,10 @@ const charts = {
     secondM: {
         title: "2nd Declension (Masculine)",
         cases: [
-            ["Nominative", "-us / -er", "ī"],
-            ["Dative", "ō", "īs"],
-            ["Accusative", "um", "ōs"],
-            ["Ablative", "ō", "īs"]
+            ["Nominative", "varies", "i"],
+            ["Dative", "o", "is"],
+            ["Accusative", "um", "os"],
+            ["Ablative", "o", "is"]
         ]
     },
 
@@ -71,18 +71,18 @@ const charts = {
         title: "2nd Declension (Neuter)",
         cases: [
             ["Nominative", "um", "a"],
-            ["Dative", "ō", "īs"],
+            ["Dative", "o", "is"],
             ["Accusative", "um", "a"],
-            ["Ablative", "ō", "īs"]
+            ["Ablative", "o", "is"]
         ]
     },
 
     thirdMF: {
         title: "3rd Declension (Masculine/Feminine)",
         cases: [
-            ["Nominative", "varies", "ēs"],
-            ["Dative", "ī", "ibus"],
-            ["Accusative", "em", "ēs"],
+            ["Nominative", "varies", "es"],
+            ["Dative", "i", "ibus"],
+            ["Accusative", "em", "es"],
             ["Ablative", "e", "ibus"]
         ]
     },
@@ -91,7 +91,7 @@ const charts = {
         title: "3rd Declension (Neuter)",
         cases: [
             ["Nominative", "varies", "a"],
-            ["Dative", "ī", "ibus"],
+            ["Dative", "i", "ibus"],
             ["Accusative", "varies", "a"],
             ["Ablative", "e", "ibus"]
         ]
@@ -201,11 +201,12 @@ function createCharts() {
 // Normalize answers
 
 function normalize(value) {
-
-    return value.toLowerCase()
+    return value
+        .toLowerCase()
         .trim()
+        .normalize("NFD")
+        .replace(/\u0304/g, "") // Remove macrons
         .replace(/[\s-]/g, "");
-
 }
 
 
