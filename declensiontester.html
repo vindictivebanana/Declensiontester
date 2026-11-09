@@ -18,11 +18,6 @@
 
     <h1>Latin Declension Practice</h1>
 
-    <p class="instructions">
-        Fill in the singular and plural endings for every case
-        in all five declensions. Then check your answers!
-    </p>
-
     <div id="charts"></div>
 
     <div class="controls">
@@ -267,17 +262,6 @@ function checkAnswers() {
         });
 
     });
-
-    document.getElementById("feedback").textContent =
-        correct === total
-            ? "Perfect! All answers are correct!"
-            : correct + " out of " + total + " correct.";
-
-    document.getElementById("score").textContent =
-        "Keep practicing until you get all 40 correct!";
-
-}
-
 
 // Show every answer
 
